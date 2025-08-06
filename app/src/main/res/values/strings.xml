@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">VkNews</string>
+    <string name="bottom_nav_home">Главная</string>
+    <string name="bottom_nav_favorite">Избранное</string>
+    <string name="bottom_nav_profile">Профиль</string>
+    <integer name="com_vk_sdk_AppId">53996053</integer>
+</resources>

@@ -1,0 +1,95 @@
+package com.example.vknews.presentation.postScreen
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.vknews.MainViewModel
+import com.example.vknews.domain.DataPostCard
+import com.example.vknews.navigation.NavGraph
+import com.example.vknews.navigation.rememberNavigationState
+import com.example.vknews.presentation.commentsScreen.CommentScreen
+
+@Composable
+fun MainScreen() {
+    val viewModel: MainViewModel = viewModel()
+    val screenState = viewModel.screenState.collectAsState()
+    when (screenState.value) {
+        PostsState.Initial -> {}
+        is PostsState.Posts -> PostsScreen((screenState.value as PostsState.Posts).posts)
+    }
+
+}
+
+@Composable
+private fun PostsScreen(
+    listPosts: List<DataPostCard>
+) {
+    val navigationState = rememberNavigationState()
+    Scaffold(
+        bottomBar = {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                val items = listOf(BottomItem.Home, BottomItem.Favorite, BottomItem.Profile)
+                val getCurrentState by navigationState.navController.currentBackStackEntryAsState()
+                items.forEach { item ->
+                    val selected = getCurrentState?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } ?: false
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = {
+                            if (!selected) {
+                                navigationState.navigateTo(item.screen.route)
+                            }
+                        },
+                        icon = { Icon(imageVector = item.icon, contentDescription = null) },
+                        label = { Text(stringResource(item.textRes)) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            indicatorColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                }
+            }
+        }
+    ) { paddingValues ->
+
+        NavGraph(
+            navHostController = navigationState.navController,
+            postsScreen = {
+                HomeScreen(
+                    paddingValues,
+                    listPosts,
+                    goToCommentScreen = { postCard ->
+                        navigationState.navigateComments(postCard)
+                    })
+            },
+            commentsScreen = {postCard ->
+                CommentScreen(
+                    onBackPressed = {
+                        navigationState.navController.popBackStack()
+                    },
+                    postCard = postCard
+                )
+            },
+            favoriteScreen = { Text(text = "Favorite Content", color = Color.White) },
+            profileScreen = { Text(text = "Profile Content", color = Color.White) }
+        )
+
+    }
+}
+
