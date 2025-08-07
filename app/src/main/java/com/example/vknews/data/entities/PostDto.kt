@@ -7,11 +7,14 @@ import com.example.vknews.data.entities.statistics.ViewsDto
 import com.google.gson.annotations.SerializedName
 
 data class PostDto(
-    @SerializedName("id") val id: Int,
-    @SerializedName("is_favorite") val like: Boolean,
+    @SerializedName("id") val id: String,
+    @SerializedName("source_id") val ownerId: Long,
+    @SerializedName("is_favorite") val isFavorite: Boolean,
     @SerializedName("text") val text: String,
-    @SerializedName("likes") val countLikes: LikesDto,
-    @SerializedName("reposts") val countReposts: RepostsDto,
-    @SerializedName("views") val countViews: ViewsDto,
-    @SerializedName("comments") val countComments: CommentsDto
+    @SerializedName("date") val date: Long,
+    @SerializedName("likes") val likes: LikesDto,
+    @SerializedName("reposts") val reposts: RepostsDto,
+    @SerializedName("views") val views: ViewsDto,
+    @SerializedName("comments") val comments: CommentsDto,
+    @SerializedName("attachments") val attachments: List<AttachmentsDto>?
 )

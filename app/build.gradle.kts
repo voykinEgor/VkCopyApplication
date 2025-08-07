@@ -55,16 +55,19 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
     implementation("com.google.code.gson:gson:2.13.1")
 
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.vk.id:vkid:2.5.0")
     implementation("com.vk.id:onetap-compose:2.5.0")
-//    implementation("com.vk.id:vk-sdk-support:4.1.0")
     implementation("com.vk:android-sdk-core:4.1.0")
     implementation("com.vk:android-sdk-api:4.1.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
     implementation (libs.gson)
     implementation (libs.retrofit)

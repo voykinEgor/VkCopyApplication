@@ -1,5 +1,6 @@
 package com.example.vknews.presentation.postScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.vknews.R
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
@@ -50,8 +52,9 @@ fun PostCard(
                 text = postCardInfo.postText
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Image(
-                painter = painterResource(postCardInfo.postImageRes),
+            Log.d("LOG_TAG1", "AvatarImage: ${postCardInfo.postImageUrl}")
+            AsyncImage(
+                model = postCardInfo.postImageUrl,
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
@@ -151,11 +154,12 @@ fun ProfileView(
             .padding(8.dp)
 
     ) {
-        Image(
+        Log.d("LOG_TAG1", "AvatarImage: ${postCardInfo.avatarUrl}")
+        AsyncImage(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape),
-            painter = painterResource(id = postCardInfo.avatarRes),
+            model = postCardInfo.avatarUrl,
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))
