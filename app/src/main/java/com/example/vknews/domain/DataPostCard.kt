@@ -6,16 +6,19 @@ import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
+import kotlin.random.Random
 
 @Parcelize
 data class DataPostCard (
-    val id: String,
+    val id: Long,
     val communityName: String,
+    val ownerId: Long,
     val publishDate: String,
     val avatarUrl: String,
     val postText: String,
     val postImageUrl: String?,
-    val statistics: List<StatisticsItem>
+    val statistics: List<StatisticsItem>,
+    val isFavorite: Boolean
 ): Parcelable{
     companion object{
         val PostNavigationType = object : NavType<DataPostCard>(false){

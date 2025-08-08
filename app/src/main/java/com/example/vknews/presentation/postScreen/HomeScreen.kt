@@ -1,5 +1,6 @@
 package com.example.vknews.presentation.postScreen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ fun HomeScreen(
     listPosts: List<DataPostCard>,
     goToCommentScreen: (DataPostCard) -> Unit
 ){
+    Log.d("LOG_TAG1", "Recomposition HomeScreen")
     val viewModel: MainViewModel = viewModel()
     LazyColumn(
         modifier = Modifier.padding(paddingValues)
@@ -86,7 +88,7 @@ private fun determineTypeClickListeners(
 ) {
     when (item.type) {
         TypeStatistics.VIEWS -> viewModel.updateCount(postCard, item)
-        TypeStatistics.LIKES -> viewModel.updateCount(postCard, item)
+        TypeStatistics.LIKES -> viewModel.changeLikeStatus(postCard)
         TypeStatistics.COMMENTS -> goToCommentScreen(postCard)
         TypeStatistics.REPOSTS -> viewModel.updateCount(postCard, item)
     }

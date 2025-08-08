@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,8 @@ import com.example.vknews.R
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
 import com.example.vknews.domain.TypeStatistics
+import com.example.vknews.ui.theme.DarkBlue
+import com.example.vknews.ui.theme.DarkRed
 
 
 @Composable
@@ -52,7 +55,6 @@ fun PostCard(
                 text = postCardInfo.postText
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Log.d("LOG_TAG1", "AvatarImage: ${postCardInfo.postImageUrl}")
             AsyncImage(
                 model = postCardInfo.postImageUrl,
                 contentDescription = null,
@@ -63,7 +65,7 @@ fun PostCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Statistics(postCardInfo.statistics, onStatisticItemClick)
+            Statistics(postCardInfo.statistics, onStatisticItemClick, postCardInfo.isFavorite)
         }
     }
 }
@@ -71,15 +73,16 @@ fun PostCard(
 @Composable
 fun Statistics(
     statistics: List<StatisticsItem>,
-    onItemClick: (StatisticsItem) -> Unit
+    onItemClick: (StatisticsItem) -> Unit,
+    isFavorite: Boolean
 ) {
     Row {
         Row(modifier = Modifier.weight(1f)) {
             val viewsItem = statistics.findByType(TypeStatistics.VIEWS)
             IconWithText(
-                R.drawable.eye,
-                viewsItem.count.toString(),
-                {onItemClick(viewsItem)}
+                iconId = R.drawable.eye,
+                text = formatCount(viewsItem.count),
+                onClick = { onItemClick(viewsItem) }
             )
         }
 
@@ -91,24 +94,35 @@ fun Statistics(
             val commentItem = statistics.findByType(TypeStatistics.COMMENTS)
             val likesItem = statistics.findByType(TypeStatistics.LIKES)
             IconWithText(
-                R.drawable.ic_share,
-                repostsItem.count.toString(),
-                { onItemClick(repostsItem) }
+                iconId = R.drawable.ic_share,
+                text = formatCount(repostsItem.count),
+                onClick = { onItemClick(repostsItem) }
             )
             IconWithText(
-                R.drawable.comment,
-                commentItem.count.toString(),
-                { onItemClick(commentItem) }
+                iconId = R.drawable.comment,
+                text = formatCount(commentItem.count),
+                onClick = { onItemClick(commentItem) }
             )
             IconWithText(
-                R.drawable.like_empty,
-                likesItem.count.toString(),
-                { onItemClick(likesItem) }
+                iconId = if (isFavorite)R.drawable.like_filled else R.drawable.like_empty,
+                text = formatCount(likesItem.count),
+                onClick = { onItemClick(likesItem) },
+                tint = if (isFavorite) DarkRed else MaterialTheme.colorScheme.onSecondary
             )
         }
     }
 
 
+}
+
+private fun formatCount(count: Int): String {
+    return if (count > 100_000) {
+        String.format("%sK", (count / 1000))
+    } else if (count > 1000) {
+        String.format("%.1fK", (count / 1000f))
+    } else {
+        count.toString()
+    }
 }
 
 private fun List<StatisticsItem>.findByType(type: TypeStatistics): StatisticsItem {
@@ -120,7 +134,8 @@ private fun List<StatisticsItem>.findByType(type: TypeStatistics): StatisticsIte
 fun IconWithText(
     iconId: Int,
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    tint: Color = MaterialTheme.colorScheme.onSecondary
 ) {
     Row(
         modifier = Modifier.clickable {
@@ -131,7 +146,7 @@ fun IconWithText(
         Icon(
             modifier = Modifier.size(20.dp),
             painter = painterResource(iconId),
-            tint = MaterialTheme.colorScheme.onSecondary,
+            tint = tint,
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -154,7 +169,6 @@ fun ProfileView(
             .padding(8.dp)
 
     ) {
-        Log.d("LOG_TAG1", "AvatarImage: ${postCardInfo.avatarUrl}")
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)

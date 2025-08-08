@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vknews.data.ApiFactory
 import com.example.vknews.data.ApiService
+import com.example.vknews.data.FeedPostRepository
 import com.example.vknews.data.mapper.FeedPostMapper
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
@@ -19,21 +20,25 @@ class MainViewModel : ViewModel() {
     private val _postsState = MutableStateFlow<PostsState>(initialState)
     val screenState = _postsState.asStateFlow()
 
-    private val mapper = FeedPostMapper()
+    val repository = FeedPostRepository()
 
     init {
         loadPosts()
     }
 
     fun loadPosts(){
-        val token = VKID.instance.accessToken?.token ?: throw IllegalArgumentException("Отсутствует токен")
         viewModelScope.launch {
-            val response = ApiFactory.apiService.getFeedPosts(token)
-            val listDataPostCard = mapper.mapFeedPostsDtoToEntities(response)
-            _postsState.value = PostsState.Posts(listDataPostCard)
+            _postsState.value = PostsState.Posts(repository.loadPosts())
         }
-
     }
+
+    fun changeLikeStatus(feedPost: DataPostCard){
+        viewModelScope.launch {
+            repository.changeLikeStatus(feedPost)
+            _postsState.value = PostsState.Posts(repository.postsList)
+        }
+    }
+
 
     fun updateCount(postCard: DataPostCard, item: StatisticsItem) {
         val currentState = _postsState.value
