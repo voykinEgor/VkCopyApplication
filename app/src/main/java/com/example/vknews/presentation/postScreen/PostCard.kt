@@ -104,7 +104,7 @@ fun Statistics(
                 onClick = { onItemClick(commentItem) }
             )
             IconWithText(
-                iconId = if (isFavorite)R.drawable.like_filled else R.drawable.like_empty,
+                iconId = if (isFavorite) R.drawable.like_filled else R.drawable.like_empty,
                 text = formatCount(likesItem.count),
                 onClick = { onItemClick(likesItem) },
                 tint = if (isFavorite) DarkRed else MaterialTheme.colorScheme.onSecondary

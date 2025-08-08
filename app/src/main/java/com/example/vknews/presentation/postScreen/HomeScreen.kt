@@ -27,10 +27,9 @@ import com.example.vknews.domain.TypeStatistics
 fun HomeScreen(
     paddingValues: PaddingValues,
     listPosts: List<DataPostCard>,
+    viewModel: MainViewModel,
     goToCommentScreen: (DataPostCard) -> Unit
 ){
-    Log.d("LOG_TAG1", "Recomposition HomeScreen")
-    val viewModel: MainViewModel = viewModel()
     LazyColumn(
         modifier = Modifier.padding(paddingValues)
     ) {

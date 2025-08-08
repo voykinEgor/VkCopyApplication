@@ -27,14 +27,15 @@ fun MainScreen() {
     val screenState = viewModel.screenState.collectAsState()
     when (screenState.value) {
         PostsState.Initial -> {}
-        is PostsState.Posts -> PostsScreen((screenState.value as PostsState.Posts).posts)
+        is PostsState.Posts -> PostsScreen((screenState.value as PostsState.Posts).posts, viewModel)
     }
 
 }
 
 @Composable
 private fun PostsScreen(
-    listPosts: List<DataPostCard>
+    listPosts: List<DataPostCard>,
+    viewModel: MainViewModel
 ) {
     val navigationState = rememberNavigationState()
     Scaffold(
@@ -74,6 +75,7 @@ private fun PostsScreen(
                 HomeScreen(
                     paddingValues,
                     listPosts,
+                    viewModel,
                     goToCommentScreen = { postCard ->
                         navigationState.navigateComments(postCard)
                     })
