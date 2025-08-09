@@ -1,7 +1,9 @@
 package com.example.vknews.data.mapper
 
 import android.util.Log
+import com.example.vknews.data.entities.CommentsResponseDto
 import com.example.vknews.data.entities.ResponseFeedPost
+import com.example.vknews.domain.CommentItem
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
 import com.example.vknews.domain.TypeStatistics
@@ -27,7 +29,7 @@ class FeedPostMapper{
                 id = post.id,
                 ownerId = post.ownerId,
                 communityName = group.name,
-                publishDate = getSimpleDate(post.date * 1000),
+                publishDate = getSimpleDate(post.date),
                 avatarUrl = group.photo,
                 postText = post.text,
                 postImageUrl = post.attachments?.firstOrNull()?.photo?.photos?.lastOrNull()?.url,
@@ -45,8 +47,28 @@ class FeedPostMapper{
         return listEntities
     }
 
+    fun mapResponseToComments(response: CommentsResponseDto): List<CommentItem>{
+        val listComments = mutableListOf<CommentItem>()
+
+        val comments = response.response.commentsList
+        val profiles = response.response.listProfiles
+
+        for (comment in comments){
+            val profile = profiles.firstOrNull{it.id == comment.authorId} ?: continue
+            val commentEntity = CommentItem(
+                id = comment.id,
+                authorName = "${profile.firstName} ${profile.lastName}",
+                authorImageUrl = profile.usersPhotoUrl,
+                commentText = comment.text,
+                publicationTime = getSimpleDate(comment.date)
+            )
+            listComments.add(commentEntity)
+        }
+
+        return listComments
+    }
     private fun getSimpleDate(timeMillis: Long): String{
-        val date = Date(timeMillis)
+        val date = Date(timeMillis * 1000)
         return SimpleDateFormat("d MMMM yyyy, hh:mm", Locale.getDefault()).format(date)
     }
 }

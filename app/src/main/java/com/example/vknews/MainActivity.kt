@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vknews.presentation.authScreen.AuthScreen
 import com.example.vknews.presentation.authScreen.AuthState
 import com.example.vknews.presentation.authScreen.AuthViewModel
-import com.example.vknews.presentation.postScreen.MainScreen
+import com.example.vknews.presentation.postScreen.PostsScreen
 import com.example.vknews.ui.theme.VkNewsTheme
 
 
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                 val authState = viewModel.auth.collectAsState()
                 when(authState.value){
                     is AuthState.Authorized -> {
-                        MainScreen()
+                        PostsScreen()
                     }
                     AuthState.NotAuthorized -> {
                         AuthScreen(viewModel)

@@ -1,5 +1,9 @@
 package com.example.vknews.presentation.postScreen
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -10,8 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -20,23 +27,34 @@ import com.example.vknews.domain.DataPostCard
 import com.example.vknews.navigation.NavGraph
 import com.example.vknews.navigation.rememberNavigationState
 import com.example.vknews.presentation.commentsScreen.CommentScreen
+import com.example.vknews.ui.theme.DarkBlue
 
 @Composable
-fun MainScreen() {
+private fun MainScreen(paddingValues: PaddingValues, onCommentClickListener: (DataPostCard) -> Unit) {
     val viewModel: MainViewModel = viewModel()
     val screenState = viewModel.screenState.collectAsState()
-    when (screenState.value) {
+    when (val currentState = screenState.value) {
         PostsState.Initial -> {}
-        is PostsState.Posts -> PostsScreen((screenState.value as PostsState.Posts).posts, viewModel)
-    }
+        is PostsState.Posts -> HomeScreen(
+            paddingValues = paddingValues,
+            listPosts = currentState.posts,
+            viewModel = viewModel,
+            nextDataIsLoading = currentState.isLoading,
+            goToCommentScreen = { postCard ->
+                onCommentClickListener(postCard)
+            }
+        )
 
+        PostsState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                CircularProgressIndicator(color = DarkBlue)
+            }
+        }
+    }
 }
 
 @Composable
-private fun PostsScreen(
-    listPosts: List<DataPostCard>,
-    viewModel: MainViewModel
-) {
+fun PostsScreen() {
     val navigationState = rememberNavigationState()
     Scaffold(
         bottomBar = {
@@ -72,13 +90,12 @@ private fun PostsScreen(
         NavGraph(
             navHostController = navigationState.navController,
             postsScreen = {
-                HomeScreen(
-                    paddingValues,
-                    listPosts,
-                    viewModel,
-                    goToCommentScreen = { postCard ->
-                        navigationState.navigateComments(postCard)
-                    })
+                MainScreen(
+                    paddingValues = paddingValues,
+                    onCommentClickListener = { dataPostCard ->
+                        navigationState.navigateComments(dataPostCard)
+                    },
+                )
             },
             commentsScreen = {postCard ->
                 CommentScreen(

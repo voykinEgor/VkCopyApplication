@@ -5,13 +5,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,14 +27,16 @@ import com.example.vknews.MainViewModel
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
 import com.example.vknews.domain.TypeStatistics
+import com.example.vknews.ui.theme.DarkBlue
 
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues,
     listPosts: List<DataPostCard>,
     viewModel: MainViewModel,
+    nextDataIsLoading: Boolean,
     goToCommentScreen: (DataPostCard) -> Unit
-){
+) {
     LazyColumn(
         modifier = Modifier.padding(paddingValues)
     ) {
@@ -76,6 +83,24 @@ fun HomeScreen(
             }
 
         }
+        item {
+            Log.d("LOG_TAG1", "Item scrolled")
+            if (nextDataIsLoading){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = DarkBlue)
+                }
+            }else{
+                SideEffect {
+                    viewModel.loadNextPosts()
+                }
+            }
+        }
     }
 }
 
@@ -86,9 +111,9 @@ private fun determineTypeClickListeners(
     goToCommentScreen: (DataPostCard) -> Unit
 ) {
     when (item.type) {
-        TypeStatistics.VIEWS -> viewModel.updateCount(postCard, item)
+        TypeStatistics.VIEWS -> {}
         TypeStatistics.LIKES -> viewModel.changeLikeStatus(postCard)
         TypeStatistics.COMMENTS -> goToCommentScreen(postCard)
-        TypeStatistics.REPOSTS -> viewModel.updateCount(postCard, item)
+        TypeStatistics.REPOSTS -> {}
     }
 }

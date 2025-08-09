@@ -81,8 +81,7 @@ fun Statistics(
             val viewsItem = statistics.findByType(TypeStatistics.VIEWS)
             IconWithText(
                 iconId = R.drawable.eye,
-                text = formatCount(viewsItem.count),
-                onClick = { onItemClick(viewsItem) }
+                text = formatCount(viewsItem.count)
             )
         }
 
@@ -95,8 +94,7 @@ fun Statistics(
             val likesItem = statistics.findByType(TypeStatistics.LIKES)
             IconWithText(
                 iconId = R.drawable.ic_share,
-                text = formatCount(repostsItem.count),
-                onClick = { onItemClick(repostsItem) }
+                text = formatCount(repostsItem.count)
             )
             IconWithText(
                 iconId = R.drawable.comment,
@@ -134,13 +132,16 @@ private fun List<StatisticsItem>.findByType(type: TypeStatistics): StatisticsIte
 fun IconWithText(
     iconId: Int,
     text: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     tint: Color = MaterialTheme.colorScheme.onSecondary
 ) {
-    Row(
-        modifier = Modifier.clickable {
+    val modifier = if (onClick == null) Modifier else {
+        Modifier.clickable {
             onClick()
-        },
+        }
+    }
+    Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

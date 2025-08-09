@@ -1,16 +1,13 @@
 package com.example.vknews.data
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.vknews.data.ApiFactory.apiService
 import com.example.vknews.data.mapper.FeedPostMapper
+import com.example.vknews.domain.CommentItem
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
 import com.example.vknews.domain.TypeStatistics
-import com.example.vknews.presentation.postScreen.PostsState
-import com.example.vknews.presentation.postScreen.Statistics
 import com.vk.id.VKID
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class FeedPostRepository {
     private val mapper = FeedPostMapper()
@@ -20,11 +17,20 @@ class FeedPostRepository {
     val token =
         VKID.instance.accessToken?.token ?: throw IllegalArgumentException("Отсутствует токен")
 
+    private var nextFrom: String? = null
+
     suspend fun loadPosts(): List<DataPostCard> {
-        val response = ApiFactory.apiService.getFeedPosts(token)
+        val startFrom = nextFrom
+        if (startFrom == null && postsList.isNotEmpty()) return postsList
+        val response =
+            if (startFrom == null) apiService.getFeedPosts(token) else apiService.getFeedPosts(
+                token,
+                startFrom
+            )
+        nextFrom = response.response.nextFrom
         val listDataPostCard = mapper.mapFeedPostsDtoToEntities(response)
         _postsList.addAll(listDataPostCard)
-        return listDataPostCard
+        return postsList
     }
 
     suspend fun changeLikeStatus(feedPost: DataPostCard) {
@@ -47,7 +53,19 @@ class FeedPostRepository {
             add(StatisticsItem(type = TypeStatistics.LIKES, newLikesCount))
         }
         val newPost = feedPost.copy(statistics = newStatistics, isFavorite = !feedPost.isFavorite)
-        val postIndex = _postsList.indexOfFirst { it.id == feedPost.id && it.ownerId == feedPost.ownerId }
+        val postIndex =
+            _postsList.indexOfFirst { it.id == feedPost.id && it.ownerId == feedPost.ownerId }
         _postsList[postIndex] = newPost
+    }
+
+    suspend fun ignoreItem(feedPost: DataPostCard){
+        apiService.ignoreItem(token, feedPost.ownerId, feedPost.id)
+        _postsList.remove(feedPost)
+    }
+
+    suspend fun getComments(feedPost: DataPostCard): List<CommentItem>{
+        val response = apiService.getComments(token, feedPost.ownerId, feedPost.id)
+        val listComments = mapper.mapResponseToComments(response).filter { it.commentText.isNotBlank() }
+        return listComments
     }
 }
