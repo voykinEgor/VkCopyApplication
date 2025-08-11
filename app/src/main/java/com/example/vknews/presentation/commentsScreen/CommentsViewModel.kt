@@ -7,24 +7,18 @@ import com.example.vknews.domain.CommentItem
 import com.example.vknews.domain.DataPostCard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class CommentsViewModel(
     postCard: DataPostCard
 ): ViewModel() {
     val repository = FeedPostRepository()
-    private val _commentsState = MutableStateFlow<CommentsState>(CommentsState.Initial)
-    val commentsState = _commentsState.asStateFlow()
-
-    init {
-        loadComments(postCard)
-    }
-
-    fun loadComments(postCard: DataPostCard){
-        viewModelScope.launch {
-            val commentsList = repository.getComments(postCard)
-            _commentsState.value = CommentsState.Comments(postCard, commentsList)
-        }
-    }
+    val commentsState = repository.getComments(postCard)
+        .filter { it.isNotEmpty() }
+        .onStart { CommentsState.Initial }
+        .map { CommentsState.Comments(postCard, it) }
 
 }

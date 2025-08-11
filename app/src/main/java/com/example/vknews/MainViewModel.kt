@@ -1,55 +1,54 @@
 package com.example.vknews
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vknews.data.ApiFactory
-import com.example.vknews.data.ApiService
 import com.example.vknews.data.FeedPostRepository
-import com.example.vknews.data.mapper.FeedPostMapper
 import com.example.vknews.domain.DataPostCard
-import com.example.vknews.domain.StatisticsItem
+import com.example.vknews.extensions.mergeWith
+import com.example.vknews.navigation.Screen
 import com.example.vknews.presentation.postScreen.PostsState
-import com.vk.id.VKID
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-
-    private val initialState = PostsState.Initial
-    private val _postsState = MutableStateFlow<PostsState>(initialState)
-    val screenState = _postsState.asStateFlow()
-
     val repository = FeedPostRepository()
 
-    init {
-        _postsState.value = PostsState.Loading
-        loadPosts()
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        Log.d("LOG_TAG1", "exceptionHandler caught exception")
     }
 
-    fun loadPosts() {
-        viewModelScope.launch {
-            _postsState.value = PostsState.Posts(repository.loadPosts())
+    val loadingState = MutableSharedFlow<PostsState>()
+    val screenState = repository.postsLoading
+        .filter { it.isNotEmpty() }
+        .map { PostsState.Posts(it) }
+        .onStart { PostsState.Loading }
+        .mergeWith(loadingState)
+
+
+
+    fun loadNextPosts() {
+        viewModelScope.launch(exceptionHandler) {
+            loadingState.emit(PostsState.Posts(repository.postsList, true))
+            repository.updatePosts()
         }
     }
 
-    fun loadNextPosts() {
-        _postsState.value = PostsState.Posts(repository.postsList, true)
-        loadPosts()
-    }
-
     fun changeLikeStatus(feedPost: DataPostCard) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             repository.changeLikeStatus(feedPost)
-            _postsState.value = PostsState.Posts(repository.postsList)
         }
     }
 
     fun deletePost(postCard: DataPostCard) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             repository.ignoreItem(postCard)
-            _postsState.value = PostsState.Posts(repository.postsList)
         }
     }
 }

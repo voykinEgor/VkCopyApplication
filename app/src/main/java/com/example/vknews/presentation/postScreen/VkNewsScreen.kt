@@ -32,7 +32,7 @@ import com.example.vknews.ui.theme.DarkBlue
 @Composable
 private fun MainScreen(paddingValues: PaddingValues, onCommentClickListener: (DataPostCard) -> Unit) {
     val viewModel: MainViewModel = viewModel()
-    val screenState = viewModel.screenState.collectAsState()
+    val screenState = viewModel.screenState.collectAsState(PostsState.Initial)
     when (val currentState = screenState.value) {
         PostsState.Initial -> {}
         is PostsState.Posts -> HomeScreen(

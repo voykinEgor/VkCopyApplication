@@ -51,7 +51,7 @@ fun AuthScreen(
                     sizeStyle = OneTapButtonSizeStyle.SMALL_38,
                     elevationStyle = OneTapButtonElevationStyle.Custom(4f)
                 ),
-                onAuth = { _, token ->  viewModel.performedAuthorized(token)},
+                onAuth = { _, token ->  viewModel.performedAuthorized()},
                 fastAuthEnabled = false,
                 authParams = initializer.build()
             )

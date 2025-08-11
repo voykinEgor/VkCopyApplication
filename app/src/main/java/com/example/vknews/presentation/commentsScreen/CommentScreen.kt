@@ -45,7 +45,7 @@ fun CommentScreen(
     postCard: DataPostCard
 ) {
     val viewModel: CommentsViewModel = viewModel(factory = CommentsViewModelFactory(postCard))
-    val screenState = viewModel.commentsState.collectAsState()
+    val screenState = viewModel.commentsState.collectAsState(CommentsState.Initial)
     val currentState = screenState.value
     if (currentState is CommentsState.Comments) {
         Scaffold(

@@ -2,25 +2,21 @@ package com.example.vknews.presentation.authScreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.vknews.data.FeedPostRepository
 import com.vk.id.AccessToken
 import com.vk.id.VKID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AuthViewModel: ViewModel() {
+    val repository = FeedPostRepository()
+    val auth = repository.authFlow
 
-    private val _auth = MutableStateFlow<AuthState>(AuthState.Initial)
-    val auth = _auth.asStateFlow()
-
-    init {
-        val token = VKID.instance.accessToken
-        Log.d("LOG_TAG1", "Token: ${token?.token}")
-        _auth.value = if (token != null) AuthState.Authorized(token) else AuthState.NotAuthorized
+    fun performedAuthorized(){
+        viewModelScope.launch {
+            repository.updateAuthState()
+        }
     }
-
-    fun performedAuthorized(token: AccessToken){
-        _auth.value = if (VKID.instance.accessToken != null) AuthState.Authorized(VKID.instance.accessToken!!) else AuthState.NotAuthorized
-    }
-
-
 }
