@@ -8,48 +8,48 @@ import com.example.vknews.data.FeedPostRepository
 import com.example.vknews.data.mapper.FeedPostMapper
 import com.example.vknews.domain.DataPostCard
 import com.example.vknews.domain.StatisticsItem
+import com.example.vknews.extensions.mergeWith
 import com.example.vknews.presentation.postScreen.PostsState
 import com.vk.id.VKID
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.fold
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
+    private val repository = FeedPostRepository()
+    private val loadingState = repository.loadPosts
 
-    private val initialState = PostsState.Initial
-    private val _postsState = MutableStateFlow<PostsState>(initialState)
-    val screenState = _postsState.asStateFlow()
+    private val nextPostsActionState = MutableSharedFlow<PostsState>()
 
-    val repository = FeedPostRepository()
+    val screenState = loadingState
+        .filter { it.isNotEmpty() }
+        .map{ PostsState.Posts(it) as PostsState}
+        .onStart { emit(PostsState.Loading) }
+        .mergeWith(nextPostsActionState)
 
-    init {
-        _postsState.value = PostsState.Loading
-        loadPosts()
-    }
-
-    fun loadPosts() {
+    fun loadNextPosts(){
         viewModelScope.launch {
-            _postsState.value = PostsState.Posts(repository.loadPosts())
+            nextPostsActionState.emit(PostsState.Posts(loadingState.value, true))
+            repository.loadNextData()
         }
-    }
-
-    fun loadNextPosts() {
-        _postsState.value = PostsState.Posts(repository.postsList, true)
-        loadPosts()
     }
 
     fun changeLikeStatus(feedPost: DataPostCard) {
         viewModelScope.launch {
             repository.changeLikeStatus(feedPost)
-            _postsState.value = PostsState.Posts(repository.postsList)
         }
     }
 
     fun deletePost(postCard: DataPostCard) {
         viewModelScope.launch {
             repository.ignoreItem(postCard)
-            _postsState.value = PostsState.Posts(repository.postsList)
         }
     }
 }
