@@ -84,7 +84,6 @@ fun HomeScreen(
 
         }
         item {
-            Log.d("LOG_TAG1", "Item scrolled")
             if (nextDataIsLoading){
                 Box(
                     modifier = Modifier
