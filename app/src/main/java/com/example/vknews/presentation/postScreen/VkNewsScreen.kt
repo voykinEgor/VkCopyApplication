@@ -18,12 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vknews.MainViewModel
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.domain.entities.DataPostCard
 import com.example.vknews.navigation.NavGraph
 import com.example.vknews.navigation.rememberNavigationState
 import com.example.vknews.presentation.commentsScreen.CommentScreen

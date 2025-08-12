@@ -1,4 +1,4 @@
-package com.example.vknews.domain
+package com.example.vknews.domain.entities
 
 import android.os.Build
 import android.os.Parcelable
@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
-import kotlin.random.Random
 
 @Parcelize
 data class DataPostCard (

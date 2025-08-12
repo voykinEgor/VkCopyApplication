@@ -1,27 +1,27 @@
 package com.example.vknews.data
 
-import android.util.Log
 import com.example.vknews.data.ApiFactory.apiService
 import com.example.vknews.data.mapper.FeedPostMapper
-import com.example.vknews.domain.CommentItem
-import com.example.vknews.domain.DataPostCard
-import com.example.vknews.domain.StatisticsItem
-import com.example.vknews.domain.TypeStatistics
+import com.example.vknews.domain.entities.CommentItem
+import com.example.vknews.domain.entities.DataPostCard
+import com.example.vknews.domain.entities.StatisticsItem
+import com.example.vknews.domain.entities.TypeStatistics
+import com.example.vknews.domain.repository.FeedPostRepository
 import com.example.vknews.extensions.mergeWith
 import com.example.vknews.presentation.authScreen.AuthState
 import com.vk.id.VKID
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 
-class FeedPostRepository {
+class FeedPostRepositoryImpl: FeedPostRepository {
     private val mapper = FeedPostMapper()
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -29,22 +29,10 @@ class FeedPostRepository {
     private val _postsList = mutableListOf<DataPostCard>()
     val postsList get() = _postsList.toList()
 
-    val authFlow = flow {
-        updateAuthState.emit(Unit)
-        updateAuthState.collect {
-            val tokenFlow = VKID.instance.accessToken?.token
-            emit(if (tokenFlow != null) AuthState.Authorized(VKID.instance.accessToken!!) else AuthState.NotAuthorized)
-        }
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = AuthState.Initial
-    )
-
     val token
       get() = VKID.instance.accessToken?.token ?: throw IllegalArgumentException("Отсутствует токен")
 
-    val flowLoadingPosts = flow {
+    private val flowLoadingPosts = flow {
         updatePostsState.emit(Unit)
         updatePostsState.collect {
             val startFrom = nextFrom
@@ -73,7 +61,19 @@ class FeedPostRepository {
     private val updatePostsState = MutableSharedFlow<Unit>(replay = 1)
     private val updateAuthState = MutableSharedFlow<Unit>(replay = 1)
 
-    val postsLoading = flowLoadingPosts
+    override fun getAuthState(): StateFlow<AuthState> = flow {
+        updateAuthState.emit(Unit)
+        updateAuthState.collect {
+            val tokenFlow = VKID.instance.accessToken?.token
+            emit(if (tokenFlow != null) AuthState.Authorized(VKID.instance.accessToken!!) else AuthState.NotAuthorized)
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = AuthState.Initial
+    )
+
+    override fun getPosts(): StateFlow<List<DataPostCard>> = flowLoadingPosts
         .mergeWith(refreshedState)
         .stateIn(
             scope = coroutineScope,
@@ -81,15 +81,15 @@ class FeedPostRepository {
             initialValue = postsList
         )
 
-    suspend fun updatePosts() {
+    override suspend fun updatePosts() {
         updatePostsState.emit(Unit)
     }
 
-    suspend fun updateAuthState() {
+    override suspend fun updateAuthState() {
         updateAuthState.emit(Unit)
     }
 
-    suspend fun changeLikeStatus(feedPost: DataPostCard) {
+    override suspend fun changeLikeStatus(feedPost: DataPostCard) {
         val response = if (feedPost.isFavorite) {
             apiService.deleteLike(
                 token = token,
@@ -115,13 +115,13 @@ class FeedPostRepository {
         refreshedState.emit(postsList)
     }
 
-    suspend fun ignoreItem(feedPost: DataPostCard) {
+    override suspend fun ignoreItem(feedPost: DataPostCard) {
         apiService.ignoreItem(token, feedPost.ownerId, feedPost.id)
         _postsList.remove(feedPost)
         refreshedState.emit(postsList)
     }
 
-    fun getComments(feedPost: DataPostCard): Flow<List<CommentItem>> = flow {
+    override fun getComments(feedPost: DataPostCard): StateFlow<List<CommentItem>> = flow {
         val response = apiService.getComments(token, feedPost.ownerId, feedPost.id)
         val listComments =
             mapper.mapResponseToComments(response).filter { it.commentText.isNotBlank() }

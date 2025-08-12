@@ -1,6 +1,6 @@
 package com.example.vknews.presentation.postScreen
 
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.domain.entities.DataPostCard
 
 sealed class PostsState {
     object Initial: PostsState()

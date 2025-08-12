@@ -1,12 +1,11 @@
 package com.example.vknews.data.mapper
 
-import android.util.Log
 import com.example.vknews.data.entities.CommentsResponseDto
 import com.example.vknews.data.entities.ResponseFeedPost
-import com.example.vknews.domain.CommentItem
-import com.example.vknews.domain.DataPostCard
-import com.example.vknews.domain.StatisticsItem
-import com.example.vknews.domain.TypeStatistics
+import com.example.vknews.domain.entities.CommentItem
+import com.example.vknews.domain.entities.DataPostCard
+import com.example.vknews.domain.entities.StatisticsItem
+import com.example.vknews.domain.entities.TypeStatistics
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

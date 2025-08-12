@@ -3,29 +3,35 @@ package com.example.vknews
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vknews.data.FeedPostRepository
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.data.FeedPostRepositoryImpl
+import com.example.vknews.domain.entities.DataPostCard
+import com.example.vknews.domain.useCases.ChangeLikeStatusUseCase
+import com.example.vknews.domain.useCases.GetPostsUseCase
+import com.example.vknews.domain.useCases.IgnorePostUseCase
+import com.example.vknews.domain.useCases.UpdatePostsUseCase
 import com.example.vknews.extensions.mergeWith
-import com.example.vknews.navigation.Screen
 import com.example.vknews.presentation.postScreen.PostsState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-    val repository = FeedPostRepository()
+    private val repository = FeedPostRepositoryImpl()
+
+    private val getPostsUseCase = GetPostsUseCase(repository)
+    private val updatePostsUseCase = UpdatePostsUseCase(repository)
+    private val changeLikeStatusUseCase = ChangeLikeStatusUseCase(repository)
+    private val deletePostUseCase = IgnorePostUseCase(repository)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("LOG_TAG1", "exceptionHandler caught exception")
     }
 
     val loadingState = MutableSharedFlow<PostsState>()
-    val screenState = repository.postsLoading
+    val screenState = getPostsUseCase()
         .filter { it.isNotEmpty() }
         .map { PostsState.Posts(it) }
         .onStart { PostsState.Loading }
@@ -36,19 +42,19 @@ class MainViewModel : ViewModel() {
     fun loadNextPosts() {
         viewModelScope.launch(exceptionHandler) {
             loadingState.emit(PostsState.Posts(repository.postsList, true))
-            repository.updatePosts()
+            updatePostsUseCase()
         }
     }
 
     fun changeLikeStatus(feedPost: DataPostCard) {
         viewModelScope.launch(exceptionHandler) {
-            repository.changeLikeStatus(feedPost)
+            changeLikeStatusUseCase(feedPost)
         }
     }
 
     fun deletePost(postCard: DataPostCard) {
         viewModelScope.launch(exceptionHandler) {
-            repository.ignoreItem(postCard)
+            deletePostUseCase(postCard)
         }
     }
 }

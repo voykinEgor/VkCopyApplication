@@ -1,14 +1,11 @@
 package com.example.vknews.navigation
 
-import android.provider.ContactsContract
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.example.vknews.domain.DataPostCard
-import com.google.gson.Gson
+import com.example.vknews.domain.entities.DataPostCard
 
 fun NavGraphBuilder.homeNavGraph(
     commentsScreen: @Composable (DataPostCard) -> Unit,

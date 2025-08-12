@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.domain.entities.DataPostCard
 
 class NavigationState(
     val navController: NavHostController

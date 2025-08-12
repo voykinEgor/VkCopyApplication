@@ -1,6 +1,5 @@
 package com.example.vknews.presentation.postScreen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,11 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vknews.MainViewModel
-import com.example.vknews.domain.DataPostCard
-import com.example.vknews.domain.StatisticsItem
-import com.example.vknews.domain.TypeStatistics
+import com.example.vknews.domain.entities.DataPostCard
+import com.example.vknews.domain.entities.StatisticsItem
+import com.example.vknews.domain.entities.TypeStatistics
 import com.example.vknews.ui.theme.DarkBlue
 
 @Composable

@@ -2,7 +2,7 @@ package com.example.vknews.presentation.commentsScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.domain.entities.DataPostCard
 
 class CommentsViewModelFactory (
     val post: DataPostCard

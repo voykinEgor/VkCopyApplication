@@ -1,7 +1,7 @@
 package com.example.vknews.navigation
 
 import android.net.Uri
-import com.example.vknews.domain.DataPostCard
+import com.example.vknews.domain.entities.DataPostCard
 import com.google.gson.Gson
 
 sealed class Screen(

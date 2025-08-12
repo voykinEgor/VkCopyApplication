@@ -1,7 +1,6 @@
 package com.example.vknews.presentation.commentsScreen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,16 +26,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
-import com.example.vknews.R
-import com.example.vknews.domain.CommentItem
-import com.example.vknews.domain.DataPostCard
-import com.example.vknews.ui.theme.VkNewsTheme
+import com.example.vknews.domain.entities.CommentItem
+import com.example.vknews.domain.entities.DataPostCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -57,17 +57,17 @@ dependencies {
     testImplementation(libs.junit)
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
-    implementation("com.google.code.gson:gson:2.13.1")
+    implementation(libs.gson)
 
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation("com.vk.id:vkid:2.5.0")
-    implementation("com.vk.id:onetap-compose:2.5.0")
-    implementation("com.vk:android-sdk-core:4.1.0")
-    implementation("com.vk:android-sdk-api:4.1.0")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.vkid)
+    implementation(libs.onetap.compose)
+    implementation(libs.android.sdk.core)
+    implementation(libs.android.sdk.api)
 
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     implementation (libs.gson)
     implementation (libs.retrofit)

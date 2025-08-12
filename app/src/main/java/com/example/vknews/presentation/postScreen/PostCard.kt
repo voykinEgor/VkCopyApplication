@@ -1,7 +1,5 @@
 package com.example.vknews.presentation.postScreen
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,10 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.vknews.R
-import com.example.vknews.domain.DataPostCard
-import com.example.vknews.domain.StatisticsItem
-import com.example.vknews.domain.TypeStatistics
-import com.example.vknews.ui.theme.DarkBlue
+import com.example.vknews.domain.entities.DataPostCard
+import com.example.vknews.domain.entities.StatisticsItem
+import com.example.vknews.domain.entities.TypeStatistics
 import com.example.vknews.ui.theme.DarkRed
 
 
